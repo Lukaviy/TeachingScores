@@ -69,6 +69,15 @@ tl::expected<ts::VerifiedData, std::string> ts::VerifiedData::verify(Data &&data
         }
     }
 
+    for (const auto& article : data.articles) {
+        if (!data.appearance.count(article.id)) {
+            return tl::unexpected("appearance is not found for article with id " + std::to_string(unsigned(article.id)));
+        }
+        if (!data.firstAppearance.count(article.id)) {
+            return tl::unexpected("first appearance is not found for article with id " + std::to_string(unsigned(article.id)));
+        }
+    }
+
     return ts::VerifiedData(std::move(data));
 }
 
