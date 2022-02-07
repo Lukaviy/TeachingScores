@@ -1,5 +1,7 @@
 #include "datamodel.h"
 
+#include <algorithm>
+
 using namespace ts;
 
 ComputedDataModel ComputedDataModel::compute(VerifiedData &&verified_data)
@@ -11,7 +13,17 @@ ComputedDataModel ComputedDataModel::compute(VerifiedData &&verified_data)
         computedData.insert_or_assign(article.id, std::move(computedDataForArticle));
     }
 
-    return ComputedDataModel(std::move(data), std::move(computedData));
+    auto lastArticleId = data.articles.front().id;
+    for (const auto& article: data.articles) {
+        lastArticleId = std::max(article.id, lastArticleId);
+    }
+
+    auto lastSubjectId = data.subjects.front().id;
+    for (const auto& subject: data.subjects) {
+        lastSubjectId = std::max(subject.id, lastSubjectId);
+    }
+
+    return ComputedDataModel(std::move(data), std::move(computedData), lastArticleId, lastSubjectId);
 }
 
 class ThereMustBeAtLeastOneSubject : public std::exception {};
@@ -39,25 +51,31 @@ void ComputedDataModel::setFirstAppearance(Subject::Id subjectId, Article::Id ar
     m_computedData.insert_or_assign(articleId, algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId));
 }
 
-void ComputedDataModel::addSubject(Subject &&subject)
+Subject::Id ComputedDataModel::addSubject(std::string&& name)
 {
-    m_data.subjects.emplace_back(std::move(subject));
+    auto subjectId = Subject::Id(++m_lastSubjectId);
+
+    m_data.subjects.emplace_back(Subject { .id = subjectId, .name = std::move(name) });
 
     for (auto& [articleId, data] : m_computedData) {
         data = ts::algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId);
     }
+
+    return subjectId;
 }
 
-void ComputedDataModel::addArticle(Article &&article)
+Article::Id ComputedDataModel::addArticle(std::string&& name)
 {
-    auto articleId = article.id;
+    auto articleId = Article::Id(++m_lastArticleId);
 
-    m_data.articles.emplace_back(std::move(article));
+    m_data.articles.emplace_back(Article { .id = articleId, .name = std::move(name) });
 
     m_data.appearance.insert_or_assign(articleId, std::set<Subject::Id> { m_data.subjects.front().id });
     m_data.firstAppearance.insert_or_assign(articleId, m_data.subjects.front().id);
 
     m_computedData.insert_or_assign(articleId, algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId));
+
+    return articleId;
 }
 
 void ComputedDataModel::renameArticle(int index, std::string &&name)
@@ -118,7 +136,8 @@ VerifiedData ComputedDataModel::getData() const noexcept
     return ts::VerifiedData::unverifiedFromRawData(ts::Data(m_data));
 }
 
-ComputedDataModel::ComputedDataModel(Data&& data, std::map<Article::Id, algorithm::ComputedData>&& computedData) : m_data(std::move(data)), m_computedData(std::move(computedData))
+ComputedDataModel::ComputedDataModel(Data&& data, std::map<Article::Id, algorithm::ComputedData>&& computedData, Article::Id lastArticleId, Subject::Id lastSubjectId)
+    : m_data(std::move(data)), m_computedData(std::move(computedData)), m_lastArticleId(lastArticleId), m_lastSubjectId(lastSubjectId)
 {
 
 }
@@ -291,18 +310,18 @@ bool DataModel::setHeaderData(int section, Qt::Orientation orientation, const QV
     return false;
 }
 
-void DataModel::addSubject(ts::Subject &&subject)
+void DataModel::addSubject(std::string&& name)
 {
     const auto subjectsEndColumnIndex = getSubjectsColumnIndexEnd();
     beginInsertColumns(QModelIndex(), subjectsEndColumnIndex, subjectsEndColumnIndex);
-    m_dataModel.addSubject(std::move(subject));
+    m_dataModel.addSubject(std::move(name));
     endInsertColumns();
 }
 
-void DataModel::addArticle(ts::Article &&article)
+void DataModel::addArticle(std::string&& name)
 {
     beginInsertRows(QModelIndex(), rowCount(QModelIndex()), rowCount(QModelIndex()));
-    m_dataModel.addArticle(std::move(article));
+    m_dataModel.addArticle(std::move(name));
     endInsertRows();
 }
 

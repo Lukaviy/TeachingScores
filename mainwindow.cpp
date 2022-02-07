@@ -111,17 +111,11 @@ void MainWindow::addNewSubject()
         return;
     }
 
-    m_dataModel->addSubject(ts::Subject{
-                                .id = ts::UniqueIdProvider<ts::Subject>::generateId(),
-                                .name = dialog.getSubjectName().toStdString()
-                            });
+    m_dataModel->addSubject(dialog.getSubjectName().toStdString());
 }
 
 void MainWindow::addNewArticle()
 {
-    m_dataModel->addArticle(ts::Article{
-                                .id = ts::UniqueIdProvider<ts::Article>::generateId(),
-                                .name = "New Subject"
-                            });
+    m_dataModel->addArticle("New Subject");
 }
 

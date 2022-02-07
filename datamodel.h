@@ -15,8 +15,8 @@ namespace ts {
         void setAppearance(Subject::Id, Article::Id, bool appearance);
         void setFirstAppearance(Subject::Id, Article::Id);
 
-        void addSubject(Subject&& subject);
-        void addArticle(Article&& article);
+        Subject::Id addSubject(std::string&& name);
+        Article::Id addArticle(std::string&& article);
 
         void renameArticle(int index, std::string&& name);
         void renameSubject(int index, std::string&& name);
@@ -31,11 +31,13 @@ namespace ts {
 
         VerifiedData getData() const noexcept;
     private:
-        ComputedDataModel(Data&& data, std::map<Article::Id, algorithm::ComputedData>&& computedData);
+        ComputedDataModel(Data&& data, std::map<Article::Id, algorithm::ComputedData>&& computedData, Article::Id lastArticleId, Subject::Id lastSubjectId);
 
         Data m_data;
 
         std::map<Article::Id, algorithm::ComputedData> m_computedData;
+        unsigned m_lastArticleId = 0;
+        unsigned m_lastSubjectId = 0;
     };
 }
 
@@ -56,8 +58,8 @@ public:
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     bool setHeaderData(int section, Qt::Orientation orientation, const QVariant &value, int role = Qt::EditRole) override;
 
-    void addSubject(ts::Subject&& subject);
-    void addArticle(ts::Article&& article);
+    void addSubject(std::string&& name);
+    void addArticle(std::string&& name);
 
     std::optional<int> getSubjectIndex(int column) const;
 
