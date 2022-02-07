@@ -165,13 +165,13 @@ QVariant DataModel::data(const QModelIndex &index, int role) const
         const auto colCount = columnCount(QModelIndex());
 
         if (index.column() == colCount - 3) {
-            return getComputedData().l;
+            return QString::number(getComputedData().l, 'f', 2);
         }
         if (index.column() == colCount - 2) {
-            return getComputedData().c;
+            return QString::number(getComputedData().c, 'f', 2);
         }
         if (index.column() == colCount - 1) {
-            return getComputedData().h;
+            return QString::number(getComputedData().h, 'f', 2);
         }
     }
 
