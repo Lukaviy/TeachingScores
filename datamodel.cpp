@@ -2,8 +2,9 @@
 
 using namespace ts;
 
-ComputedDataModel ComputedDataModel::compute(Data &&data)
+ComputedDataModel ComputedDataModel::compute(VerifiedData &&verified_data)
 {
+    auto data = std::move(verified_data).data();
     std::map<Article::Id, algorithm::ComputedData> computedData;
     for (const auto& article : data.articles) {
         auto computedDataForArticle = ts::algorithm::computeOuterLinks(data.subjects, data.firstAppearance, data.appearance, article.id);
@@ -112,6 +113,11 @@ const algorithm::ComputedData ComputedDataModel::getComputedDataForArticle(Artic
     return article->second;
 }
 
+VerifiedData ComputedDataModel::getData() const noexcept
+{
+    return ts::VerifiedData::unverifiedFromRawData(ts::Data(m_data));
+}
+
 ComputedDataModel::ComputedDataModel(Data&& data, std::map<Article::Id, algorithm::ComputedData>&& computedData) : m_data(std::move(data)), m_computedData(std::move(computedData))
 {
 
@@ -167,17 +173,20 @@ QVariant DataModel::data(const QModelIndex &index, int role) const
         if (index.column() == colCount - 1) {
             return getComputedData().h;
         }
-
-        const auto& subject = m_dataModel.getSubjects().at(index.column() - subjectsStart);
-
-        return m_dataModel.isArticleFirstAppearedAt(article.id, subject.id) ? QString::fromWCharArray(L"✔️") : QString::fromWCharArray(L"❌");
     }
 
-    if (role == Qt::CheckStateRole) {
-        if (auto subjectIndex = getSubjectIndex(index.column())) {
-            const auto& subject = m_dataModel.getSubjects().at(subjectIndex.value());
 
+    if (auto subjectIndex = getSubjectIndex(index.column())) {
+        const auto& subject = m_dataModel.getSubjects().at(subjectIndex.value());
+
+        if (role == Qt::CheckStateRole) {
             return m_dataModel.isArticleAppearedAt(article.id, subject.id) ? Qt::Checked : Qt::Unchecked;
+        }
+        if (role == Qt::DisplayRole) {
+            return m_dataModel.isArticleFirstAppearedAt(article.id, subject.id) ? QString::fromWCharArray(L"✔️") : QString::fromWCharArray(L"❌");
+        }
+        if (role == Qt::EditRole) {
+            return m_dataModel.isArticleFirstAppearedAt(article.id, subject.id);
         }
     }
 
@@ -237,11 +246,12 @@ bool DataModel::setData(const QModelIndex &index, const QVariant &value, int rol
         }
     }
 
-    if (role == Qt::CheckStateRole) {
-        if (auto subjectsIndex = getSubjectIndex(index.column())) {
-            const auto& article = m_dataModel.getArticles().at(index.row());
-            const auto& subject = m_dataModel.getSubjects().at(subjectsIndex.value());
+    if (auto subjectsIndex = getSubjectIndex(index.column())) {
+        const auto& article = m_dataModel.getArticles().at(index.row());
+        const auto& subject = m_dataModel.getSubjects().at(subjectsIndex.value());
 
+
+        if (role == Qt::CheckStateRole) {
             try {
                 m_dataModel.setAppearance(subject.id, article.id, value == Qt::Checked);
             } catch (const ThereMustBeAtLeastOneSubject&) {
@@ -250,6 +260,14 @@ bool DataModel::setData(const QModelIndex &index, const QVariant &value, int rol
 
             emit dataChanged(index, index);
             emit dataChanged(createIndex(index.row(), getSubjectsColumnIndexEnd() - 1), createIndex(index.row(), columnCount(QModelIndex()) - 1));
+
+            return true;
+        }
+
+        if (role == Qt::EditRole && value.toBool()) {
+            m_dataModel.setFirstAppearance(subject.id, article.id);
+
+            emit dataChanged(createIndex(index.row(), subjectsStart), createIndex(index.row(), columnCount(QModelIndex()) - 1));
 
             return true;
         }
@@ -295,6 +313,11 @@ std::optional<int> DataModel::getSubjectIndex(int column) const
     }
 
     return std::nullopt;
+}
+
+VerifiedData DataModel::getData() const
+{
+    return m_dataModel.getData();
 }
 
 int DataModel::getSubjectsColumnIndexEnd() const

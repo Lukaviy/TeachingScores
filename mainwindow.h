@@ -19,6 +19,8 @@ public:
 
 public slots:
     void newFile();
+    void saveFile();
+    void openFile();
 
     void addNewSubject();
     void addNewArticle();
@@ -27,5 +29,7 @@ private:
     Ui::MainWindow *ui;
 
     std::unique_ptr<DataModel> m_dataModel;
+
+    std::optional<QString> m_filePath;
 };
 #endif // MAINWINDOW_H

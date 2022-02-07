@@ -10,7 +10,7 @@
 namespace ts {
     class ComputedDataModel {
     public:
-        static ComputedDataModel compute(Data&& data);
+        static ComputedDataModel compute(VerifiedData&& data);
 
         void setAppearance(Subject::Id, Article::Id, bool appearance);
         void setFirstAppearance(Subject::Id, Article::Id);
@@ -28,6 +28,8 @@ namespace ts {
         bool isArticleFirstAppearedAt(Article::Id, Subject::Id) const noexcept;
 
         const algorithm::ComputedData getComputedDataForArticle(Article::Id id) const noexcept;
+
+        VerifiedData getData() const noexcept;
     private:
         ComputedDataModel(Data&& data, std::map<Article::Id, algorithm::ComputedData>&& computedData);
 
@@ -58,6 +60,8 @@ public:
     void addArticle(ts::Article&& article);
 
     std::optional<int> getSubjectIndex(int column) const;
+
+    ts::VerifiedData getData() const;
 
     static constexpr auto subjectsStart = 1;
     static constexpr auto reservedColumns = 3;

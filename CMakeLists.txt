@@ -41,7 +41,10 @@ set(PROJECT_SOURCES
         algorithm.h algorithm.cpp
         addnewsubjectdialog.h addnewsubjectdialog.cpp addnewsubjectdialog.ui
         dataformats.h
-        jsonformat.h jsonformat.cpp
+        formats/jsonformat.h formats/jsonformat.cpp
+        libs/expected/include/tl/expected.hpp
+        undo/renamearticlecommand.h undo/renamearticlecommand.cpp
+        view/itemdelegate.h view/itemdelegate.cpp
         ${TS_FILES}
 )
 

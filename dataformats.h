@@ -2,18 +2,19 @@
 #define DATAFORMATS_H
 
 #include "Data.h"
+#include "libs/expected/include/tl/expected.hpp"
 
 namespace ts::formats {
     class DataExporter {
     public:
-        virtual ~DataExporter() = 0;
-        virtual QByteArray exportData(const ts::Data& data) = 0;
+        virtual ~DataExporter() = default;
+        [[nodiscard]] virtual QByteArray exportData(const ts::VerifiedData& data) noexcept = 0;
     };
 
     class DataImporter {
     public:
-        virtual ~DataImporter() = 0;
-        virtual ts::Data importData(const QByteArray& data) = 0;
+        virtual ~DataImporter() = default;
+        [[nodiscard]] virtual tl::expected<ts::VerifiedData, std::string> importData(const QByteArray& data) noexcept = 0;
     };
 }
 
