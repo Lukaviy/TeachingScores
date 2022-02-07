@@ -214,7 +214,7 @@ QVariant DataModel::headerData(int section, Qt::Orientation orientation, int rol
 
         const auto& subject = m_dataModel.getSubjects().at(section - subjectsStart);
 
-        return QString::fromStdString(subject.name);
+        return QString::fromStdString(subject.name) + "\n" + QString::number(section);
     }
 
     if (role == Qt::ItemDataRole::DisplayRole && orientation == Qt::Orientation::Vertical) {
