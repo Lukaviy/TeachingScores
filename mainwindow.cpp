@@ -8,6 +8,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include "view/itemdelegate.h"
+#include "dialogs/subjecteditdialog.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -15,17 +16,8 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
 
-    auto data = ts::VerifiedData::initializeWithDefaults({
-                                               ts::Subject{ .id = ts::UniqueIdProvider<ts::Subject>::generateId(), .name = "Subject Huita" }
-                                           },
-                                           {
-                                               ts::Article{ .id = ts::UniqueIdProvider<ts::Article>::generateId(), .name = "Article Huita" }
-                                           }
-                                           ).value();
-
-    m_dataModel = std::make_unique<DataModel>(ts::ComputedDataModel::compute(std::move(data)));
-
-    ui->tableView->setModel(m_dataModel.get());
+    emit modelReady(false);
+    emit C_nu_changed(std::nullopt);
 }
 
 MainWindow::~MainWindow()
@@ -33,9 +25,17 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
+void MainWindow::C_nu_changed(std::optional<float> C_nu)
+{
+    emit C_nu_textChanged(C_nu ? QString::number(C_nu.value(), 'f', 2) : "N/A");
+}
+
 void MainWindow::newFile()
 {
+    ui->tableView->setModel(nullptr);
+    m_dataModel.reset();
 
+    emit modelReady(false);
 }
 
 void MainWindow::saveFile()
@@ -93,12 +93,7 @@ void MainWindow::openFile()
         return;
     }
 
-    auto model = std::make_unique<DataModel>(ts::ComputedDataModel::compute(std::move(data).value()));
-
-    ui->tableView->setModel(model.get());
-    //ui->tableView->setItemDelegate(new ItemDelegate());
-
-    m_dataModel = std::move(model);
+    setNewModel(std::make_unique<DataModel>(ts::ComputedDataModel::compute(std::move(data).value())));
 
     m_filePath = filePath;
 }
@@ -111,11 +106,89 @@ void MainWindow::addNewSubject()
         return;
     }
 
-    m_dataModel->addSubject(dialog.getSubjectName().toStdString());
+    auto subjectNames = dialog.getSubjectNames();
+
+    if (subjectNames.empty()) {
+        return;
+    }
+
+    if (!m_dataModel) {
+        std::vector<ts::Subject> newSubjects;
+        newSubjects.reserve(subjectNames.size());
+
+        auto idGenerator = ts::IdGenerator<ts::Subject>{};
+
+        for (auto& subjectName : subjectNames) {
+            newSubjects.push_back(ts::Subject{ .id = idGenerator.newId(), .name = std::move(subjectName).toStdString() });
+        }
+
+        auto data = ts::VerifiedData::initializeWithDefaults(std::move(newSubjects), {}).value();
+
+        setNewModel(std::make_unique<DataModel>(ts::ComputedDataModel::compute(std::move(data))));
+    } else {
+        for (auto& subjectName : subjectNames) {
+            m_dataModel->addSubject(std::move(subjectName).toStdString());
+        }
+    }
 }
 
 void MainWindow::addNewArticle()
 {
-    m_dataModel->addArticle("New Subject");
+    if (!m_dataModel) {
+        throw std::exception("Model is not ready");
+    }
+    m_dataModel->addArticle("New Article");
+}
+
+void MainWindow::sort()
+{
+    m_dataModel->sort();
+}
+
+void MainWindow::editSubjects()
+{
+    auto oldSubjects = m_dataModel ? std::vector{ m_dataModel->getSubjects() } : std::vector<ts::Subject>{};
+
+    SubjectEditDialog dialog(std::move(oldSubjects));
+
+    if (dialog.exec() == QDialog::Rejected) {
+        return;
+    }
+
+    auto subjects = dialog.getSubjects();
+
+    if (subjects.empty()) {
+        QMessageBox::critical(this, "Error", "There must be atleast one subject");
+        return;
+    }
+
+    m_dataModel->setSubjects(std::move(subjects));
+}
+
+void MainWindow::removeArticle()
+{
+    if (!m_dataModel) {
+        return;
+    }
+
+    const auto currentIndex = ui->tableView->currentIndex();
+
+    if (!currentIndex.isValid()) {
+        return;
+    }
+
+    m_dataModel->removeArticle(currentIndex.row());
+}
+
+void MainWindow::setNewModel(std::unique_ptr<DataModel> model)
+{
+    ui->tableView->setModel(nullptr);
+    m_dataModel = std::move(model);
+    ui->tableView->setModel(m_dataModel.get());
+
+    connect(m_dataModel.get(), &DataModel::C_nu_changed, this, &MainWindow::C_nu_changed);
+
+    emit modelReady(true);
+    C_nu_changed(m_dataModel->getC_nu());
 }
 

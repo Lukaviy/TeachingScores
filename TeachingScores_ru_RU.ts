@@ -8,11 +8,6 @@
         <source>Dialog</source>
         <translation type="unfinished"></translation>
     </message>
-    <message>
-        <location filename="addnewsubjectdialog.ui" line="22"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Subject Name&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
-        <translation type="unfinished"></translation>
-    </message>
 </context>
 <context>
     <name>MainWindow</name>
@@ -32,37 +27,62 @@
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="65"/>
+        <location filename="mainwindow.ui" line="40"/>
+        <source>Remove Article</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="47"/>
+        <source>Sort</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="54"/>
+        <source>Edit Subjects</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="74"/>
+        <source>C_nu:</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="81"/>
+        <source>N/A</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="mainwindow.ui" line="100"/>
         <source>File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="76"/>
+        <location filename="mainwindow.ui" line="111"/>
         <source>New</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="79"/>
+        <location filename="mainwindow.ui" line="114"/>
         <source>Ctrl+N</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="84"/>
+        <location filename="mainwindow.ui" line="119"/>
         <source>Open File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="87"/>
+        <location filename="mainwindow.ui" line="122"/>
         <source>Ctrl+O</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="92"/>
+        <location filename="mainwindow.ui" line="127"/>
         <source>Save File</source>
         <translation type="unfinished"></translation>
     </message>
     <message>
-        <location filename="mainwindow.ui" line="95"/>
+        <location filename="mainwindow.ui" line="130"/>
         <source>Ctrl+S</source>
         <translation type="unfinished"></translation>
     </message>
@@ -76,6 +96,34 @@
         <location filename="mainwindow.cpp" line="83"/>
         <location filename="mainwindow.cpp" line="91"/>
         <source>Open file</source>
+        <translation type="unfinished"></translation>
+    </message>
+</context>
+<context>
+    <name>SubjectEditDialog</name>
+    <message>
+        <location filename="dialogs/subjecteditdialog.ui" line="14"/>
+        <source>Dialog</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dialogs/subjecteditdialog.ui" line="34"/>
+        <source>Up</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dialogs/subjecteditdialog.ui" line="41"/>
+        <source>Down</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dialogs/subjecteditdialog.ui" line="48"/>
+        <source>Remove</source>
+        <translation type="unfinished"></translation>
+    </message>
+    <message>
+        <location filename="dialogs/subjecteditdialog.ui" line="55"/>
+        <source>Add</source>
         <translation type="unfinished"></translation>
     </message>
 </context>

@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SubjectEditDialog</class>
+ <widget class="QDialog" name="SubjectEditDialog">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>506</width>
+    <height>397</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Dialog</string>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <item>
+      <widget class="QTableView" name="tableView">
+       <property name="gridStyle">
+        <enum>Qt::SolidLine</enum>
+       </property>
+       <attribute name="horizontalHeaderStretchLastSection">
+        <bool>true</bool>
+       </attribute>
+      </widget>
+     </item>
+     <item>
+      <layout class="QVBoxLayout" name="verticalLayout_2">
+       <item>
+        <widget class="QPushButton" name="upPushButton">
+         <property name="text">
+          <string>Up</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="downPushButton">
+         <property name="text">
+          <string>Down</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="removePushButton">
+         <property name="text">
+          <string>Remove</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="addPushButton">
+         <property name="text">
+          <string>Add</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>accepted()</signal>
+   <receiver>SubjectEditDialog</receiver>
+   <slot>accept()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>248</x>
+     <y>254</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>157</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>buttonBox</sender>
+   <signal>rejected()</signal>
+   <receiver>SubjectEditDialog</receiver>
+   <slot>reject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>316</x>
+     <y>260</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>286</x>
+     <y>274</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addPushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>SubjectEditDialog</receiver>
+   <slot>addSubject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>454</x>
+     <y>112</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>252</x>
+     <y>198</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>downPushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>SubjectEditDialog</receiver>
+   <slot>moveSubjectDown()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>454</x>
+     <y>52</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>252</x>
+     <y>198</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>removePushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>SubjectEditDialog</receiver>
+   <slot>removeSubject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>454</x>
+     <y>82</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>252</x>
+     <y>198</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>upPushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>SubjectEditDialog</receiver>
+   <slot>moveSubjectUp()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>454</x>
+     <y>22</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>252</x>
+     <y>198</y>
+    </hint>
+   </hints>
+  </connection>
+ </connections>
+ <slots>
+  <slot>moveSubjectUp()</slot>
+  <slot>moveSubjectDown()</slot>
+  <slot>addSubject()</slot>
+  <slot>removeSubject()</slot>
+ </slots>
+</ui>

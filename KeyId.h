@@ -1,6 +1,8 @@
 #ifndef KEYID_H
 #define KEYID_H
 
+#include <utility>
+
 namespace ts {
     template<typename T, typename K = unsigned int>
     class KeyId {
@@ -31,13 +33,19 @@ namespace ts {
     };
 
     template<typename T, typename K = unsigned int>
-    class UniqueIdProvider {
+    class IdGenerator {
     public:
         using Id = KeyId<T, K>;
-        static Id generateId() noexcept {
-            static K current_id = 0;
-            return Id(current_id++);
+
+        IdGenerator() : m_lastId(K{}) {}
+        IdGenerator(Id&& initValue) : m_lastId(std::move(initValue)) {}
+
+        Id newId() noexcept {
+            return Id(++m_lastId);
         }
+
+    private:
+        K m_lastId;
     };
 }
 

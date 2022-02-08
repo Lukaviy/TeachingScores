@@ -1,6 +1,7 @@
 #include "datamodel.h"
 
 #include <algorithm>
+#include <ranges>
 
 using namespace ts;
 
@@ -13,7 +14,7 @@ ComputedDataModel ComputedDataModel::compute(VerifiedData &&verified_data)
         computedData.insert_or_assign(article.id, std::move(computedDataForArticle));
     }
 
-    auto lastArticleId = data.articles.front().id;
+    auto lastArticleId = data.articles.empty() ? Article::Id{0} : data.articles.front().id;
     for (const auto& article: data.articles) {
         lastArticleId = std::max(article.id, lastArticleId);
     }
@@ -23,7 +24,9 @@ ComputedDataModel ComputedDataModel::compute(VerifiedData &&verified_data)
         lastSubjectId = std::max(subject.id, lastSubjectId);
     }
 
-    return ComputedDataModel(std::move(data), std::move(computedData), lastArticleId, lastSubjectId);
+    const auto C_nu = computeC_nu(computedData);
+
+    return ComputedDataModel(std::move(data), std::move(computedData), C_nu, lastArticleId, lastSubjectId);
 }
 
 class ThereMustBeAtLeastOneSubject : public std::exception {};
@@ -41,14 +44,25 @@ void ComputedDataModel::setAppearance(Subject::Id subjectId, Article::Id article
         articleAppearance.erase(subjectId);
     }
 
-    m_computedData.insert_or_assign(articleId, algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId));
+    const auto oldC = m_computedData.at(articleId).c;
+    const auto newComputedData = algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId);
+
+    m_computedData.insert_or_assign(articleId, newComputedData);
+
+    m_C_nu = recomputeC_nu(m_C_nu.value(), oldC, newComputedData.c, int(m_computedData.size()));
 }
 
 void ComputedDataModel::setFirstAppearance(Subject::Id subjectId, Article::Id articleId)
 {
     m_data.firstAppearance.insert_or_assign(articleId, subjectId);
 
-    m_computedData.insert_or_assign(articleId, algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId));
+    const auto oldC = m_computedData.at(articleId).c;
+
+    const auto newComputedData = algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId);
+
+    m_computedData.insert_or_assign(articleId, newComputedData);
+
+    m_C_nu = recomputeC_nu(m_C_nu.value(), oldC, newComputedData.c, int(m_computedData.size()));
 }
 
 Subject::Id ComputedDataModel::addSubject(std::string&& name)
@@ -60,6 +74,8 @@ Subject::Id ComputedDataModel::addSubject(std::string&& name)
     for (auto& [articleId, data] : m_computedData) {
         data = ts::algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId);
     }
+
+    m_C_nu = computeC_nu(m_computedData);
 
     return subjectId;
 }
@@ -74,6 +90,8 @@ Article::Id ComputedDataModel::addArticle(std::string&& name)
     m_data.firstAppearance.insert_or_assign(articleId, m_data.subjects.front().id);
 
     m_computedData.insert_or_assign(articleId, algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId));
+
+    m_C_nu = computeC_nu(m_computedData);
 
     return articleId;
 }
@@ -98,7 +116,54 @@ const std::vector<Article> &ComputedDataModel::getArticles() const noexcept
     return m_data.articles;
 }
 
-bool ComputedDataModel::isArticleAppearedAt(Article::Id articleId, Subject::Id subjectId) const noexcept
+void ComputedDataModel::setSubjects(std::vector<Subject>&& subjects)
+{
+    if (subjects.empty()) {
+        throw std::exception("There must be atleast one subject");
+    }
+
+    std::set<Subject::Id> subjectIds;
+
+    for (const auto& [id, _] : subjects) {
+        if (subjectIds.contains(id)) {
+            std::exception("There are diplicated subject ids");
+        }
+        subjectIds.insert(id);
+    }
+
+    m_data.subjects = std::move(subjects);
+
+    for (auto& [articleId, m] : m_data.appearance) {
+        for (auto iter = m.begin(); iter != m.end();) {
+            if (!subjectIds.contains(*iter)) {
+                iter = m.erase(iter);
+            } else {
+                ++iter;
+            }
+        }
+    }
+
+    for (auto iter = m_data.firstAppearance.begin(); iter != m_data.firstAppearance.end();) {
+        if (!subjectIds.contains(iter->second)) {
+            iter = m_data.firstAppearance.erase(iter);
+        } else {
+            ++iter;
+        }
+    }
+}
+
+void ComputedDataModel::removeArticle(Article::Id articleId)
+{
+    auto iter = std::ranges::remove(m_data.articles, articleId, &Article::id);
+    m_data.articles.erase(iter.begin(), iter.end());
+
+    m_data.appearance.erase(articleId);
+    m_data.firstAppearance.erase(articleId);
+
+    m_computedData.erase(articleId);
+}
+
+bool ComputedDataModel::isArticleAppearedAt(Article::Id articleId, Subject::Id subjectId) const
 {
     auto articleColumn = m_data.appearance.find(articleId);
 
@@ -109,26 +174,48 @@ bool ComputedDataModel::isArticleAppearedAt(Article::Id articleId, Subject::Id s
     return articleColumn->second.contains(subjectId);
 }
 
-bool ComputedDataModel::isArticleFirstAppearedAt(Article::Id articleId, Subject::Id subjectId) const noexcept
+bool ComputedDataModel::isArticleFirstAppearedAt(Article::Id articleId, Subject::Id subjectId) const
 {
     auto articleColumn = m_data.firstAppearance.find(articleId);
 
     if (articleColumn == m_data.firstAppearance.end()) {
-        return false;
+        throw std::exception("There are no such article");
     }
 
     return articleColumn->second == subjectId;
 }
 
-const algorithm::ComputedData ComputedDataModel::getComputedDataForArticle(Article::Id id) const noexcept
+const algorithm::ComputedData& ComputedDataModel::getComputedDataForArticle(Article::Id id) const
 {
     auto article = m_computedData.find(id);
 
     if (article == m_computedData.end()) {
-        return algorithm::ComputedData();
+        throw std::exception("There are no such article");
     }
 
     return article->second;
+}
+
+std::optional<float> ComputedDataModel::getC_nu() const noexcept
+{
+    return m_C_nu;
+}
+
+void ComputedDataModel::sort()
+{
+    std::vector<std::pair<Article, float>> articlesWithC;
+
+    articlesWithC.reserve(m_data.articles.size());
+
+    for (const auto& articleId : m_data.articles) {
+        articlesWithC.push_back({articleId, m_computedData.at(articleId.id).c});
+    }
+
+    std::ranges::sort(articlesWithC, {}, [](const auto& t) { return t.second; });
+
+    for (auto i = 0u; i < articlesWithC.size(); i++) {
+        m_data.articles[i] = std::move(articlesWithC[i].first);
+    }
 }
 
 VerifiedData ComputedDataModel::getData() const noexcept
@@ -136,10 +223,30 @@ VerifiedData ComputedDataModel::getData() const noexcept
     return ts::VerifiedData::unverifiedFromRawData(ts::Data(m_data));
 }
 
-ComputedDataModel::ComputedDataModel(Data&& data, std::map<Article::Id, algorithm::ComputedData>&& computedData, Article::Id lastArticleId, Subject::Id lastSubjectId)
-    : m_data(std::move(data)), m_computedData(std::move(computedData)), m_lastArticleId(lastArticleId), m_lastSubjectId(lastSubjectId)
+ComputedDataModel::ComputedDataModel(Data&& data, std::map<Article::Id, algorithm::ComputedData>&& computedData, std::optional<float> C_nu, Article::Id lastArticleId, Subject::Id lastSubjectId)
+    : m_data(std::move(data)), m_computedData(std::move(computedData)), m_C_nu(C_nu), m_lastArticleId(lastArticleId), m_lastSubjectId(lastSubjectId)
 {
 
+}
+
+std::optional<float> ComputedDataModel::computeC_nu(const std::map<Article::Id, algorithm::ComputedData>& computedData)
+{
+    if (computedData.empty()) {
+        return std::nullopt;
+    }
+
+    float c_sum = 0;
+
+    for (const auto& [_, data] : computedData) {
+        c_sum += data.c;
+    }
+
+    return c_sum / computedData.size();
+}
+
+float ComputedDataModel::recomputeC_nu(float C_nu, float oldC, float newC, int size)
+{
+    return C_nu - (oldC - newC) / size;
 }
 
 DataModel::DataModel(ts::ComputedDataModel&& dataModel) : m_dataModel(std::move(dataModel))
@@ -280,6 +387,8 @@ bool DataModel::setData(const QModelIndex &index, const QVariant &value, int rol
             emit dataChanged(index, index);
             emit dataChanged(createIndex(index.row(), getSubjectsColumnIndexEnd() - 1), createIndex(index.row(), columnCount(QModelIndex()) - 1));
 
+            emit C_nu_changed(m_dataModel.getC_nu());
+
             return true;
         }
 
@@ -287,6 +396,8 @@ bool DataModel::setData(const QModelIndex &index, const QVariant &value, int rol
             m_dataModel.setFirstAppearance(subject.id, article.id);
 
             emit dataChanged(createIndex(index.row(), subjectsStart), createIndex(index.row(), columnCount(QModelIndex()) - 1));
+
+            emit C_nu_changed(m_dataModel.getC_nu());
 
             return true;
         }
@@ -325,6 +436,13 @@ void DataModel::addArticle(std::string&& name)
     endInsertRows();
 }
 
+void DataModel::sort()
+{
+    m_dataModel.sort();
+
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount(QModelIndex()) - 1, columnCount(QModelIndex()) - 1));
+}
+
 std::optional<int> DataModel::getSubjectIndex(int column) const
 {
     if (column >= subjectsStart && column < getSubjectsColumnIndexEnd()) {
@@ -339,7 +457,32 @@ VerifiedData DataModel::getData() const
     return m_dataModel.getData();
 }
 
+const std::vector<ts::Subject>& DataModel::getSubjects() const
+{
+    return m_dataModel.getSubjects();
+}
+
+void DataModel::setSubjects(std::vector<ts::Subject> &&subjects)
+{
+    m_dataModel.setSubjects(std::move(subjects));
+
+    emit dataChanged(createIndex(0, 0), createIndex(rowCount(QModelIndex()) - 1, columnCount(QModelIndex()) - 1));
+    emit headerDataChanged(Qt::Horizontal, 0, columnCount(QModelIndex()) - 1);
+}
+
+void DataModel::removeArticle(int row)
+{
+    beginRemoveRows(QModelIndex(), row, row);
+    m_dataModel.removeArticle(m_dataModel.getArticles().at(row).id);
+    endRemoveRows();
+}
+
 int DataModel::getSubjectsColumnIndexEnd() const
 {
     return columnCount(QModelIndex()) - reservedColumns;
+}
+
+std::optional<float> DataModel::getC_nu() const
+{
+    return m_dataModel.getC_nu();
 }

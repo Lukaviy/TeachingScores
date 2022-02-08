@@ -13,7 +13,24 @@ AddNewSubjectDialog::~AddNewSubjectDialog()
     delete ui;
 }
 
-QString AddNewSubjectDialog::getSubjectName()
+QStringList AddNewSubjectDialog::getSubjectNames() {
+
+    QStringList res;
+
+    auto names = m_text.split("\n");
+
+    for (auto& name : names) {
+        name = name.simplified();
+
+        if (!name.isEmpty()) {
+            res.append(name);
+        }
+    }
+
+    return res;
+}
+
+void AddNewSubjectDialog::onTextChanged()
 {
-   return ui->subjectNameLineEdit->text();
+    m_text = ui->plainTextEdit->toPlainText();
 }

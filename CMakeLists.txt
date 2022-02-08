@@ -45,6 +45,9 @@ set(PROJECT_SOURCES
         libs/expected/include/tl/expected.hpp
         undo/renamearticlecommand.h undo/renamearticlecommand.cpp
         view/itemdelegate.h view/itemdelegate.cpp
+        dialogs/subjecteditdialog.h dialogs/subjecteditdialog.cpp dialogs/subjecteditdialog.ui
+        models/subjectsdatamodel.h models/subjectsdatamodel.cpp
+        formats/csvformat.h formats/csvformat.cpp
         ${TS_FILES}
 )
 

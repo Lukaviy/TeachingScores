@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>76</height>
+    <width>368</width>
+    <height>183</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -17,14 +17,7 @@
    <item>
     <layout class="QHBoxLayout" name="horizontalLayout">
      <item>
-      <widget class="QLabel" name="label">
-       <property name="text">
-        <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Subject Name&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-       </property>
-      </widget>
-     </item>
-     <item>
-      <widget class="QLineEdit" name="subjectNameLineEdit"/>
+      <widget class="QPlainTextEdit" name="plainTextEdit"/>
      </item>
     </layout>
    </item>
@@ -74,5 +67,24 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>plainTextEdit</sender>
+   <signal>textChanged()</signal>
+   <receiver>AddNewSubjectDialog</receiver>
+   <slot>onTextChanged()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>183</x>
+     <y>76</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>183</x>
+     <y>91</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
+ <slots>
+  <slot>onTextChanged()</slot>
+ </slots>
 </ui>

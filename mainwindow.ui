@@ -35,6 +35,27 @@
        </widget>
       </item>
       <item>
+       <widget class="QPushButton" name="removeArticlePushButton">
+        <property name="text">
+         <string>Remove Article</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="sortPushButton">
+        <property name="text">
+         <string>Sort</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="editSubjectsButton">
+        <property name="text">
+         <string>Edit Subjects</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -46,6 +67,20 @@
          </size>
         </property>
        </spacer>
+      </item>
+      <item>
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>C_nu:</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QLabel" name="C_nu_label">
+        <property name="text">
+         <string>N/A</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </item>
@@ -99,18 +134,18 @@
  <resources/>
  <connections>
   <connection>
-   <sender>actionNew</sender>
-   <signal>triggered()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>newFile()</slot>
+   <sender>MainWindow</sender>
+   <signal>modelReady(bool)</signal>
+   <receiver>addArticlePushButton</receiver>
+   <slot>setEnabled(bool)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>-1</x>
-     <y>-1</y>
-    </hint>
-    <hint type="destinationlabel">
      <x>399</x>
      <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>49</x>
+     <y>555</y>
     </hint>
    </hints>
   </connection>
@@ -178,12 +213,113 @@
     </hint>
    </hints>
   </connection>
+  <connection>
+   <sender>actionNew</sender>
+   <signal>triggered()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>newFile()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>-1</x>
+     <y>-1</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MainWindow</sender>
+   <signal>C_nu_textChanged(QString)</signal>
+   <receiver>C_nu_label</receiver>
+   <slot>setText(QString)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>779</x>
+     <y>555</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sortPushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>sort()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>221</x>
+     <y>555</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MainWindow</sender>
+   <signal>modelReady(bool)</signal>
+   <receiver>sortPushButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>221</x>
+     <y>555</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editSubjectsButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>editSubjects()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>308</x>
+     <y>555</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>removeArticlePushButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>removeArticle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>228</x>
+     <y>555</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
  </connections>
  <slots>
+  <signal>modelReady(bool)</signal>
+  <signal>C_nu_textChanged(QString)</signal>
   <slot>newFile()</slot>
   <slot>addNewArticle()</slot>
   <slot>addNewSubject()</slot>
   <slot>openFile()</slot>
   <slot>saveFile()</slot>
+  <slot>sort()</slot>
+  <slot>editSubjects()</slot>
+  <slot>removeArticle()</slot>
  </slots>
 </ui>

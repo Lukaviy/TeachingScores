@@ -24,18 +24,29 @@ namespace ts {
         const std::vector<Subject>& getSubjects() const noexcept;
         const std::vector<Article>& getArticles() const noexcept;
 
-        bool isArticleAppearedAt(Article::Id, Subject::Id) const noexcept;
-        bool isArticleFirstAppearedAt(Article::Id, Subject::Id) const noexcept;
+        void setSubjects(std::vector<Subject>&& subjects);
+        void removeArticle(Article::Id articleId);
 
-        const algorithm::ComputedData getComputedDataForArticle(Article::Id id) const noexcept;
+        bool isArticleAppearedAt(Article::Id, Subject::Id) const;
+        bool isArticleFirstAppearedAt(Article::Id, Subject::Id) const;
+
+        const algorithm::ComputedData& getComputedDataForArticle(Article::Id id) const;
+
+        std::optional<float> getC_nu() const noexcept;
+
+        void sort();
 
         VerifiedData getData() const noexcept;
     private:
-        ComputedDataModel(Data&& data, std::map<Article::Id, algorithm::ComputedData>&& computedData, Article::Id lastArticleId, Subject::Id lastSubjectId);
+        ComputedDataModel(Data&& data, std::map<Article::Id, algorithm::ComputedData>&& computedData, std::optional<float> C_nu, Article::Id lastArticleId, Subject::Id lastSubjectId);
+
+        static std::optional<float> computeC_nu(const std::map<Article::Id, algorithm::ComputedData>& computedData);
+        static float recomputeC_nu(float C_nu, float oldC, float newC, int size);
 
         Data m_data;
 
         std::map<Article::Id, algorithm::ComputedData> m_computedData;
+        std::optional<float> m_C_nu;
         unsigned m_lastArticleId = 0;
         unsigned m_lastSubjectId = 0;
     };
@@ -43,6 +54,7 @@ namespace ts {
 
 class DataModel : public QAbstractItemModel
 {
+    Q_OBJECT
 public:
     DataModel(ts::ComputedDataModel&& dataModel);
 
@@ -61,14 +73,26 @@ public:
     void addSubject(std::string&& name);
     void addArticle(std::string&& name);
 
+    void sort();
+
     std::optional<int> getSubjectIndex(int column) const;
 
     ts::VerifiedData getData() const;
+
+    const std::vector<ts::Subject>& getSubjects() const;
+
+    void setSubjects(std::vector<ts::Subject>&& subjects);
+
+    void removeArticle(int row);
 
     static constexpr auto subjectsStart = 1;
     static constexpr auto reservedColumns = 3;
 
     int getSubjectsColumnIndexEnd() const;
+    std::optional<float> getC_nu() const;
+
+signals:
+    void C_nu_changed(std::optional<float>);
 private:
     ts::ComputedDataModel m_dataModel;
 };

@@ -17,6 +17,9 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
+private slots:
+    void C_nu_changed(std::optional<float>);
+
 public slots:
     void newFile();
     void saveFile();
@@ -25,7 +28,19 @@ public slots:
     void addNewSubject();
     void addNewArticle();
 
+    void sort();
+
+    void editSubjects();
+
+    void removeArticle();
+
+signals:
+    void modelReady(bool);
+    void C_nu_textChanged(QString);
+
 private:
+    void setNewModel(std::unique_ptr<DataModel> model);
+
     Ui::MainWindow *ui;
 
     std::unique_ptr<DataModel> m_dataModel;

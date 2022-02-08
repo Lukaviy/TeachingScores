@@ -15,10 +15,15 @@ public:
     explicit AddNewSubjectDialog(QWidget *parent = nullptr);
     ~AddNewSubjectDialog();
 
-    QString getSubjectName();
+    QStringList getSubjectNames();
+
+public slots:
+    void onTextChanged();
 
 private:
     Ui::AddNewSubjectDialog *ui;
+
+    QString m_text;
 };
 
 #endif // ADDNEWSUBJECTDIALOG_H
