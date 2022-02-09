@@ -77,11 +77,13 @@ public:
 
     std::optional<int> getSubjectIndex(int column) const;
 
-    ts::VerifiedData getData() const;
+    const ts::ComputedDataModel& getData() const;
 
     const std::vector<ts::Subject>& getSubjects() const;
 
     void setSubjects(std::vector<ts::Subject>&& subjects);
+
+    void toggleAppearance(const QModelIndex &index);
 
     void removeArticle(int row);
 

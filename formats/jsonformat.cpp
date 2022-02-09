@@ -46,7 +46,7 @@ tl::expected<std::vector<T>, std::string> parseVector(const QJsonArray& array) {
 }
 
 
-tl::expected<ts::VerifiedData, std::string> ts::formats::JsonFormat::importData(const QByteArray& data) noexcept
+tl::expected<ts::VerifiedData, std::string> ts::formats::JsonFormat::importData(const QByteArray& data) const noexcept
 {
     QJsonParseError error;
     auto json = QJsonDocument::fromJson(data, &error);
@@ -192,8 +192,10 @@ tl::expected<ts::VerifiedData, std::string> ts::formats::JsonFormat::importData(
                                 });
 }
 
-QByteArray ts::formats::JsonFormat::exportData(const VerifiedData &data) noexcept
+QByteArray ts::formats::JsonFormat::exportData(const ts::ComputedDataModel &data_model) const noexcept
 {
+    const auto data = data_model.getData();
+
     QJsonArray subjectsListJson;
 
     for (const auto& subject : data.data().subjects) {

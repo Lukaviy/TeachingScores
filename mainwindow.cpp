@@ -4,6 +4,7 @@
 #include "addnewsubjectdialog.h"
 
 #include "formats/jsonformat.h"
+#include "formats/csvformat.h"
 
 #include <QFileDialog>
 #include <QMessageBox>
@@ -178,6 +179,41 @@ void MainWindow::removeArticle()
     }
 
     m_dataModel->removeArticle(currentIndex.row());
+}
+
+void MainWindow::exportData()
+{
+    auto filePath = QFileDialog::getSaveFileName(this, "Save File", QString(), "Csv (*.csv)");
+
+    if (filePath.isEmpty()) {
+        return;
+    }
+
+    QFile saveFile(filePath);
+
+    if (!saveFile.open(QIODevice::WriteOnly)) {
+        QMessageBox::critical(this, tr("Save file"), "Can't access file");
+
+        return;
+    }
+
+    saveFile.write(ts::formats::CsvFormat().exportData(m_dataModel->getData()));
+}
+
+void MainWindow::onCellClicked(QModelIndex index)
+{
+    if (!m_dataModel) {
+        return;
+    }
+
+    m_dataModel->toggleAppearance(index);
+}
+
+void MainWindow::onCustomContextMenuRequested(QPoint point)
+{
+    const auto index = ui->tableView->indexAt(point);
+
+    m_dataModel->setData(index, true, Qt::EditRole);
 }
 
 void MainWindow::setNewModel(std::unique_ptr<DataModel> model)

@@ -34,6 +34,11 @@ public slots:
 
     void removeArticle();
 
+    void exportData();
+
+    void onCellClicked(QModelIndex index);
+    void onCustomContextMenuRequested(QPoint point);
+
 signals:
     void modelReady(bool);
     void C_nu_textChanged(QString);

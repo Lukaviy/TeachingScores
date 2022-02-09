@@ -2,6 +2,8 @@
 
 #include <algorithm>
 #include <ranges>
+#include <QColor>
+#include <QBrush>
 
 using namespace ts;
 
@@ -305,14 +307,14 @@ QVariant DataModel::data(const QModelIndex &index, int role) const
     if (auto subjectIndex = getSubjectIndex(index.column())) {
         const auto& subject = m_dataModel.getSubjects().at(subjectIndex.value());
 
-        if (role == Qt::CheckStateRole) {
-            return m_dataModel.isArticleAppearedAt(article.id, subject.id) ? Qt::Checked : Qt::Unchecked;
-        }
         if (role == Qt::DisplayRole) {
-            return m_dataModel.isArticleFirstAppearedAt(article.id, subject.id) ? QString::fromWCharArray(L"✔️") : QString::fromWCharArray(L"❌");
+            return m_dataModel.isArticleAppearedAt(article.id, subject.id) ? QString::fromWCharArray(L"🔴") : QVariant();
         }
-        if (role == Qt::EditRole) {
-            return m_dataModel.isArticleFirstAppearedAt(article.id, subject.id);
+        if (role == Qt::BackgroundRole) {
+            return m_dataModel.isArticleFirstAppearedAt(article.id, subject.id) ? QBrush(QColor(Qt::gray)) : QVariant();
+        }
+        if (role == Qt::TextAlignmentRole) {
+            return Qt::AlignCenter;
         }
     }
 
@@ -352,9 +354,8 @@ QVariant DataModel::headerData(int section, Qt::Orientation orientation, int rol
 
 Qt::ItemFlags DataModel::flags(const QModelIndex &index) const
 {
-    if (index.column() < getSubjectsColumnIndexEnd()) {
-        auto flags = Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
-        return index.column() >= subjectsStart ? (flags | Qt::ItemIsUserCheckable) : flags;
+    if (index.column() < subjectsStart) {
+        return Qt::ItemIsEditable | Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
     }
 
     return Qt::ItemIsEnabled | Qt::ItemNeverHasChildren;
@@ -452,9 +453,9 @@ std::optional<int> DataModel::getSubjectIndex(int column) const
     return std::nullopt;
 }
 
-VerifiedData DataModel::getData() const
+const ts::ComputedDataModel& DataModel::getData() const
 {
-    return m_dataModel.getData();
+    return m_dataModel;
 }
 
 const std::vector<ts::Subject>& DataModel::getSubjects() const
@@ -468,6 +469,17 @@ void DataModel::setSubjects(std::vector<ts::Subject> &&subjects)
 
     emit dataChanged(createIndex(0, 0), createIndex(rowCount(QModelIndex()) - 1, columnCount(QModelIndex()) - 1));
     emit headerDataChanged(Qt::Horizontal, 0, columnCount(QModelIndex()) - 1);
+}
+
+void DataModel::toggleAppearance(const QModelIndex &index)
+{
+    const auto& article = m_dataModel.getArticles().at(index.row());
+
+    if (auto subjectIndex = getSubjectIndex(index.column())) {
+        const auto& subject = m_dataModel.getSubjects().at(subjectIndex.value());
+
+        setData(index, m_dataModel.isArticleAppearedAt(article.id, subject.id) ? Qt::Unchecked : Qt::Checked, Qt::CheckStateRole);
+    }
 }
 
 void DataModel::removeArticle(int row)
