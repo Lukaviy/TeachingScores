@@ -48,6 +48,7 @@ set(PROJECT_SOURCES
         dialogs/subjecteditdialog.h dialogs/subjecteditdialog.cpp dialogs/subjecteditdialog.ui
         models/subjectsdatamodel.h models/subjectsdatamodel.cpp
         formats/csvformat.h formats/csvformat.cpp
+        resources/icons.qrc
         ${TS_FILES}
 )
 

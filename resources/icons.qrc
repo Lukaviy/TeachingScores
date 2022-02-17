@@ -1,0 +1,9 @@
+<RCC>
+    <qresource prefix="/">
+        <file>icons/add_article.svg</file>
+        <file>icons/add_subject.svg</file>
+        <file>icons/edit_subjects.svg</file>
+        <file>icons/remove_article.svg</file>
+        <file>icons/sort_articles.svg</file>
+    </qresource>
+</RCC>

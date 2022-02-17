@@ -16,6 +16,108 @@
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
+     <layout class="QHBoxLayout" name="horizontalLayout_2">
+      <item>
+       <widget class="QToolButton" name="addArticleToolButton">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources/icons.qrc">
+          <normaloff>:/icons/add_article.svg</normaloff>:/icons/add_article.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>40</width>
+          <height>40</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="removeArticleToolButton">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources/icons.qrc">
+          <normaloff>:/icons/remove_article.svg</normaloff>:/icons/remove_article.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>40</width>
+          <height>40</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="addSubjectsToolButton">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources/icons.qrc">
+          <normaloff>:/icons/add_subject.svg</normaloff>:/icons/add_subject.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>40</width>
+          <height>40</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="editSubjectsToolButton">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources/icons.qrc">
+          <normaloff>:/icons/edit_subjects.svg</normaloff>:/icons/edit_subjects.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>40</width>
+          <height>40</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QToolButton" name="sortToolButton">
+        <property name="text">
+         <string>...</string>
+        </property>
+        <property name="icon">
+         <iconset resource="resources/icons.qrc">
+          <normaloff>:/icons/sort_articles.svg</normaloff>:/icons/sort_articles.svg</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>40</width>
+          <height>40</height>
+         </size>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <spacer name="horizontalSpacer_2">
+        <property name="orientation">
+         <enum>Qt::Horizontal</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
+       </spacer>
+      </item>
+     </layout>
+    </item>
+    <item>
      <widget class="QTableView" name="tableView">
       <property name="contextMenuPolicy">
        <enum>Qt::CustomContextMenu</enum>
@@ -39,41 +141,6 @@
     </item>
     <item>
      <layout class="QHBoxLayout" name="horizontalLayout">
-      <item>
-       <widget class="QPushButton" name="addArticlePushButton">
-        <property name="text">
-         <string>Add Article</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="addSubjectPushButton">
-        <property name="text">
-         <string>Add Subject</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="removeArticlePushButton">
-        <property name="text">
-         <string>Remove Article</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="sortPushButton">
-        <property name="text">
-         <string>Sort</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QPushButton" name="editSubjectsButton">
-        <property name="text">
-         <string>Edit Subjects</string>
-        </property>
-       </widget>
-      </item>
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
@@ -111,7 +178,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>20</height>
+     <height>25</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -156,56 +223,10 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources/icons.qrc"/>
+ </resources>
  <connections>
-  <connection>
-   <sender>MainWindow</sender>
-   <signal>modelReady(bool)</signal>
-   <receiver>addArticlePushButton</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>399</x>
-     <y>299</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>49</x>
-     <y>555</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>addArticlePushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>addNewArticle()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>49</x>
-     <y>557</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>299</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>addSubjectPushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>addNewSubject()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>135</x>
-     <y>557</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>299</y>
-    </hint>
-   </hints>
-  </connection>
   <connection>
    <sender>actionOpen_File</sender>
    <signal>triggered()</signal>
@@ -267,70 +288,6 @@
     <hint type="destinationlabel">
      <x>779</x>
      <y>555</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>sortPushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>sort()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>221</x>
-     <y>555</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>299</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>MainWindow</sender>
-   <signal>modelReady(bool)</signal>
-   <receiver>sortPushButton</receiver>
-   <slot>setEnabled(bool)</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>399</x>
-     <y>299</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>221</x>
-     <y>555</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>editSubjectsButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>editSubjects()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>308</x>
-     <y>555</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>299</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>removeArticlePushButton</sender>
-   <signal>clicked()</signal>
-   <receiver>MainWindow</receiver>
-   <slot>removeArticle()</slot>
-   <hints>
-    <hint type="sourcelabel">
-     <x>228</x>
-     <y>555</y>
-    </hint>
-    <hint type="destinationlabel">
-     <x>399</x>
-     <y>299</y>
     </hint>
    </hints>
   </connection>
@@ -407,6 +364,86 @@
     <hint type="sourcelabel">
      <x>399</x>
      <y>282</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addArticleToolButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>addNewArticle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>35</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>addSubjectsToolButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>addNewSubject()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>145</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>removeArticleToolButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>removeArticle()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>90</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>editSubjectsToolButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>editSubjects()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>200</x>
+     <y>60</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>sortToolButton</sender>
+   <signal>clicked()</signal>
+   <receiver>MainWindow</receiver>
+   <slot>sort()</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>255</x>
+     <y>60</y>
     </hint>
     <hint type="destinationlabel">
      <x>399</x>
