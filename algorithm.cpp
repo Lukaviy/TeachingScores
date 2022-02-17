@@ -8,18 +8,24 @@ ComputedData ts::algorithm::computeOuterLinks(const std::vector<Subject>& subjec
 {
     const auto& articleAppearance = appearance.at(articleId);
 
-    const auto i_max = articleAppearance.size();
+    auto i_max = 0u;
+
+    for (auto i = 0u; i < subjects.size(); i++) {
+        if (articleAppearance.contains(subjects[i].id)) {
+            i_max = i + 1;
+        }
+    }
 
     const auto firstAppearanceSubjectId = firstAppearance.at(articleId);
 
-    const auto t_m = std::distance(subjects.begin(), std::ranges::find(subjects, firstAppearanceSubjectId, [](const auto& v) {return v.id;}));
+    const auto t_m = std::distance(subjects.begin(), std::ranges::find(subjects, firstAppearanceSubjectId, [](const auto& v) {return v.id;})) + 1;
 
-    const auto t_p = std::min(std::distance(subjects.begin(), std::ranges::find_first_of(subjects, articleAppearance, {}, [](const auto& v) {return v.id;})), t_m);
+    const auto t_p = std::min(std::distance(subjects.begin(), std::ranges::find_first_of(subjects, articleAppearance, {}, [](const auto& v) {return v.id;})) + 1, t_m);
 
     std::vector<int> p_k_mu(subjects.size());
 
     for (auto i = 0u; i < subjects.size(); i++) {
-        p_k_mu[i] = i < t_m ? 1 : 2;
+        p_k_mu[i] = i < t_m - 1 ? 1 : 2;
     }
 
     std::vector<int> a_l(subjects.size());
@@ -33,7 +39,7 @@ ComputedData ts::algorithm::computeOuterLinks(const std::vector<Subject>& subjec
                 continue;
             }
 
-            if (t_p == t_m && t_m < i + 1) {
+            if (t_p == t_m && t_m <= i + 1) {
                 a_l[i] = p_2 * (i + 1 - t_p + 1);
             }
             if (t_p < t_m && t_m <= i + 1) {
@@ -65,7 +71,7 @@ ComputedData ts::algorithm::computeOuterLinks(const std::vector<Subject>& subjec
                 continue;
             }
 
-            if (t_p == t_m && t_m < i + 1) {
+            if (t_p == t_m && t_m <= i + 1) {
                 a_l_t[i] = a_l[i] - r(t_p, i + 1);
             }
             if (t_p < t_m && t_m <= i + 1) {
