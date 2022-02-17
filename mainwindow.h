@@ -4,6 +4,7 @@
 #include <QMainWindow>
 
 #include "datamodel.h"
+#include <QSettings>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -46,10 +47,14 @@ signals:
 private:
     void setNewModel(std::unique_ptr<DataModel> model);
 
+    void openFile(const QString&  filePath);
+
     Ui::MainWindow *ui;
 
     std::unique_ptr<DataModel> m_dataModel;
 
     std::optional<QString> m_filePath;
+
+    QSettings m_settings{"Tsoi Productions", "Teaching Scores"};
 };
 #endif // MAINWINDOW_H
