@@ -28,8 +28,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>40</width>
-          <height>40</height>
+          <width>30</width>
+          <height>30</height>
          </size>
         </property>
        </widget>
@@ -45,8 +45,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>40</width>
-          <height>40</height>
+          <width>30</width>
+          <height>30</height>
          </size>
         </property>
        </widget>
@@ -62,8 +62,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>40</width>
-          <height>40</height>
+          <width>30</width>
+          <height>30</height>
          </size>
         </property>
        </widget>
@@ -79,8 +79,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>40</width>
-          <height>40</height>
+          <width>30</width>
+          <height>30</height>
          </size>
         </property>
        </widget>
@@ -96,8 +96,8 @@
         </property>
         <property name="iconSize">
          <size>
-          <width>40</width>
-          <height>40</height>
+          <width>30</width>
+          <height>30</height>
          </size>
         </property>
        </widget>
@@ -448,6 +448,54 @@
     <hint type="destinationlabel">
      <x>399</x>
      <y>299</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MainWindow</sender>
+   <signal>modelReady(bool)</signal>
+   <receiver>addArticleToolButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>35</x>
+     <y>60</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MainWindow</sender>
+   <signal>modelReady(bool)</signal>
+   <receiver>removeArticleToolButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>90</x>
+     <y>60</y>
+    </hint>
+   </hints>
+  </connection>
+  <connection>
+   <sender>MainWindow</sender>
+   <signal>modelReady(bool)</signal>
+   <receiver>sortToolButton</receiver>
+   <slot>setEnabled(bool)</slot>
+   <hints>
+    <hint type="sourcelabel">
+     <x>399</x>
+     <y>299</y>
+    </hint>
+    <hint type="destinationlabel">
+     <x>255</x>
+     <y>60</y>
     </hint>
    </hints>
   </connection>
