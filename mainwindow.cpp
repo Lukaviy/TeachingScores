@@ -68,6 +68,28 @@ void MainWindow::saveFile()
     saveFile.write(ts::formats::JsonFormat().exportData(m_dataModel->getData()));
 }
 
+void MainWindow::saveFileAs()
+{
+    auto filePath = QFileDialog::getSaveFileName(this, "Save File", m_filePath.value_or(QString()), "Json (*.json)");
+
+    if (filePath.isEmpty()) {
+        return;
+    }
+
+    m_filePath = filePath;
+    m_settings.setValue("filePath", filePath);
+
+    QFile saveFile(m_filePath.value());
+
+    if (!saveFile.open(QIODevice::WriteOnly)) {
+        QMessageBox::critical(this, tr("Save file"), "Can't access file");
+
+        return;
+    }
+
+    saveFile.write(ts::formats::JsonFormat().exportData(m_dataModel->getData()));
+}
+
 void MainWindow::openFile()
 {
     auto filePath = QFileDialog::getOpenFileName(this, "Open File", m_filePath.value_or(QString()), "Json (*.json)");

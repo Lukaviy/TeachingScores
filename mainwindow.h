@@ -24,6 +24,7 @@ private slots:
 public slots:
     void newFile();
     void saveFile();
+    void saveFileAs();
     void openFile();
 
     void addNewSubject();
