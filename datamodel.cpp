@@ -198,6 +198,21 @@ const algorithm::ComputedData& ComputedDataModel::getComputedDataForArticle(Arti
     return article->second;
 }
 
+void ComputedDataModel::toggleSubjectAppearance(Article::Id id)
+{
+    if (m_data.appearance[id].empty()) {
+        std::set<Subject::Id> subjectsSet;
+        for (const auto& subject : m_data.subjects) {
+            subjectsSet.insert(subject.id);
+        }
+        m_data.appearance[id] = subjectsSet;
+    } else {
+        m_data.appearance[id].clear();
+    }
+
+    m_computedData[id] = getComputedDataForArticle(id);
+}
+
 std::optional<float> ComputedDataModel::getC_nu() const noexcept
 {
     return m_C_nu;
@@ -446,6 +461,13 @@ void DataModel::sort()
     m_dataModel.sort();
 
     emit dataChanged(createIndex(0, 0), createIndex(rowCount(QModelIndex()) - 1, columnCount(QModelIndex()) - 1));
+}
+
+void DataModel::toggleWholeRow(const QModelIndex &index)
+{
+    m_dataModel.toggleSubjectAppearance(m_dataModel.getArticles()[index.row()].id);
+
+    emit dataChanged(createIndex(index.row(), 0), createIndex(index.row(), columnCount(QModelIndex()) - 1));
 }
 
 std::optional<int> DataModel::getSubjectIndex(int column) const

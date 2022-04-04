@@ -30,6 +30,8 @@ public slots:
     void addNewSubject();
     void addNewArticle();
 
+    void toggleSubjects();
+
     void sort();
 
     void editSubjects();

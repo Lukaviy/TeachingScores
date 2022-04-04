@@ -143,6 +143,11 @@ void MainWindow::addNewArticle()
     m_dataModel->addArticle("New Article");
 }
 
+void MainWindow::toggleSubjects()
+{
+    m_dataModel->toggleWholeRow(ui->tableView->currentIndex());
+}
+
 void MainWindow::sort()
 {
     m_dataModel->sort();

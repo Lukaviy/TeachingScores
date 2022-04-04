@@ -32,6 +32,8 @@ namespace ts {
 
         const algorithm::ComputedData& getComputedDataForArticle(Article::Id id) const;
 
+        void toggleSubjectAppearance(Article::Id);
+
         std::optional<float> getC_nu() const noexcept;
 
         void sort();
@@ -74,6 +76,8 @@ public:
     void addArticle(std::string&& name);
 
     void sort();
+
+    void toggleWholeRow(const QModelIndex &index);
 
     std::optional<int> getSubjectIndex(int column) const;
 
