@@ -281,7 +281,6 @@ QVariant DataModel::data(const QModelIndex &index, int role) const
     const auto& article = m_dataModel.getArticles()[index.row()];
 
     if (role == Qt::ItemDataRole::DisplayRole) {
-
         if (index.column() == 0) {
             return QString::fromStdString(article.name);
         }
@@ -303,6 +302,11 @@ QVariant DataModel::data(const QModelIndex &index, int role) const
         }
     }
 
+    if (role == Qt::ItemDataRole::EditRole) {
+        if (index.column() == 0) {
+            return QString::fromStdString(article.name);
+        }
+    }
 
     if (auto subjectIndex = getSubjectIndex(index.column())) {
         const auto& subject = m_dataModel.getSubjects().at(subjectIndex.value());
