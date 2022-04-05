@@ -40,6 +40,8 @@ void MainWindow::newFile()
 {
     ui->tableView->setModel(nullptr);
     m_dataModel.reset();
+    m_filePath.reset();
+    m_settings.remove("filePath");
 
     emit modelReady(false);
 }
