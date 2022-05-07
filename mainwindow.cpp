@@ -143,7 +143,22 @@ void MainWindow::addNewArticle()
     if (!m_dataModel) {
         throw std::exception("Model is not ready");
     }
-    m_dataModel->addArticle("New Article");
+
+    AddNewSubjectDialog dialog;
+
+    if (dialog.exec() == QDialog::Rejected) {
+        return;
+    }
+
+    auto articleNames = dialog.getSubjectNames();
+
+    if (articleNames.empty()) {
+        return;
+    }
+
+    for (auto& articleName : articleNames) {
+        m_dataModel->addArticle(std::move(articleName).toStdString());
+    }
 }
 
 void MainWindow::toggleSubjects()
