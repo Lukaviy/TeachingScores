@@ -465,6 +465,10 @@ void DataModel::sort()
 
 void DataModel::toggleWholeRow(const QModelIndex &index)
 {
+    if (!index.isValid()) {
+        return;
+    }
+
     m_dataModel.toggleSubjectAppearance(m_dataModel.getArticles()[index.row()].id);
 
     emit dataChanged(createIndex(index.row(), 0), createIndex(index.row(), columnCount(QModelIndex()) - 1));
