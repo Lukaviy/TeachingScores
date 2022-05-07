@@ -221,12 +221,45 @@ std::optional<float> ComputedDataModel::getC_nu() const noexcept
 
 void ComputedDataModel::sort()
 {
-    std::vector<std::pair<Article, float>> articlesWithC;
+    class AppearanceOrder {
+    public:
+        AppearanceOrder(const std::set<Subject::Id>& appearance,
+                        const std::vector<Subject>& subjects, float score)
+        {
+            m_score = score;
+
+            m_apperance.resize(subjects.size());
+
+            for (auto i = 0u; i < subjects.size(); ++i) {
+                m_apperance[i] = appearance.count(subjects[i].id);
+            }
+        }
+
+        std::strong_ordering operator<=>(const AppearanceOrder& e) const {
+            if (m_score != e.m_score) {
+                return m_score < e.m_score ? std::strong_ordering::less : std::strong_ordering::greater;
+            }
+
+            for (auto i = 0u; i < m_apperance.size(); ++i) {
+                if (m_apperance[i] != e.m_apperance[i]) {
+                    return !m_apperance[i] ? std::strong_ordering::less : std::strong_ordering::greater;
+                }
+            }
+
+            return std::strong_ordering::equal;
+        }
+
+    private:
+        std::vector<bool> m_apperance;
+        float m_score;
+    };
+
+    std::vector<std::pair<Article, AppearanceOrder>> articlesWithC;
 
     articlesWithC.reserve(m_data.articles.size());
 
     for (const auto& articleId : m_data.articles) {
-        articlesWithC.push_back({articleId, m_computedData.at(articleId.id).h});
+        articlesWithC.push_back({articleId, AppearanceOrder(m_data.appearance.at(articleId.id), m_data.subjects, m_computedData.at(articleId.id).h)});
     }
 
     std::ranges::sort(articlesWithC, std::greater{}, [](const auto& t) { return t.second; });
