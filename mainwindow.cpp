@@ -18,9 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
 
     auto filePath = m_settings.value("filePath");
-    if (!filePath.isNull()) {
-        openFile(filePath.toString());
-    } else {
+    if (filePath.isNull() || !openFile(filePath.toString())) {
         emit modelReady(false);
         emit C_nu_changed(std::nullopt);
     }
@@ -100,7 +98,10 @@ void MainWindow::openFile()
         return;
     }
 
-    openFile(filePath);
+    if (!openFile(filePath)) {
+        emit modelReady(false);
+        emit C_nu_changed(std::nullopt);
+    }
 }
 
 void MainWindow::addNewSubject()
@@ -237,22 +238,22 @@ void MainWindow::setNewModel(std::unique_ptr<DataModel> model)
     C_nu_changed(m_dataModel->getC_nu());
 }
 
-void MainWindow::openFile(const QString& filePath)
+bool MainWindow::openFile(const QString& filePath)
 {
     QFile openFile(filePath);
 
     if (!openFile.open(QIODevice::ReadOnly)) {
-        QMessageBox::critical(this, tr("Open file"), "Can't open file");
+        QMessageBox::critical(this, tr("Open file"), tr("Can't open file"));
 
-        return;
+        return false;
     }
 
     auto fileData = openFile.readAll();
 
     if (fileData.isEmpty()) {
-        QMessageBox::critical(this, tr("Open file"), "File is empty or unexpected error occured");
+        QMessageBox::critical(this, tr("Open file"), tr("File is empty or unexpected error occured"));
 
-        return;
+        return false;
     }
 
     auto data = ts::formats::JsonFormat().importData(fileData);
@@ -260,12 +261,14 @@ void MainWindow::openFile(const QString& filePath)
     if (!data) {
         QMessageBox::critical(this, tr("Open file"), QString::fromStdString("Can't open file, file corrupted: " + data.error()));
 
-        return;
+        return false;
     }
 
     setNewModel(std::make_unique<DataModel>(ts::ComputedDataModel::compute(std::move(data).value())));
 
     m_settings.setValue("filePath", filePath);
     m_filePath = filePath;
+
+    return true;
 }
 

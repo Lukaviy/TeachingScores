@@ -50,7 +50,7 @@ signals:
 private:
     void setNewModel(std::unique_ptr<DataModel> model);
 
-    void openFile(const QString&  filePath);
+    bool openFile(const QString& filePath);
 
     Ui::MainWindow *ui;
 
