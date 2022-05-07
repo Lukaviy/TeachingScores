@@ -200,7 +200,7 @@ const algorithm::ComputedData& ComputedDataModel::getComputedDataForArticle(Arti
 
 void ComputedDataModel::toggleSubjectAppearance(Article::Id id)
 {
-    if (m_data.appearance[id].empty()) {
+    if (m_data.appearance[id].size() == 1) {
         std::set<Subject::Id> subjectsSet;
         for (const auto& subject : m_data.subjects) {
             subjectsSet.insert(subject.id);
@@ -208,6 +208,7 @@ void ComputedDataModel::toggleSubjectAppearance(Article::Id id)
         m_data.appearance[id] = subjectsSet;
     } else {
         m_data.appearance[id].clear();
+        m_data.appearance[id].insert(m_data.subjects.front().id);
     }
 
     m_computedData[id] = getComputedDataForArticle(id);
