@@ -1,7 +1,7 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "datamodel.h"
-#include "addnewsubjectdialog.h"
+#include "dialogs/addnewsubjectdialog.h"
 
 #include "formats/jsonformat.h"
 #include "formats/csvformat.h"

@@ -39,7 +39,7 @@ set(PROJECT_SOURCES
         datamodel.h
         datamodel.cpp
         algorithm.h algorithm.cpp
-        addnewsubjectdialog.h addnewsubjectdialog.cpp addnewsubjectdialog.ui
+        dialogs/addnewsubjectdialog.h dialogs/addnewsubjectdialog.cpp dialogs/addnewsubjectdialog.ui
         dataformats.h
         formats/jsonformat.h formats/jsonformat.cpp
         libs/expected/include/tl/expected.hpp
