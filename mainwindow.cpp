@@ -223,6 +223,10 @@ void MainWindow::onCustomContextMenuRequested(QPoint point)
 {
     const auto index = ui->tableView->indexAt(point);
 
+    if (!index.isValid()) {
+        return;
+    }
+
     m_dataModel->setData(index, true, Qt::EditRole);
 }
 
