@@ -25,7 +25,6 @@ namespace ts {
     struct Data {
         std::vector<Subject> subjects;
         std::vector<Article> articles;
-        std::map<Article::Id, Subject::Id> firstAppearance;
         std::map<Article::Id, std::set<Subject::Id>> appearance;
     };
 

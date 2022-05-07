@@ -18,7 +18,6 @@ tl::expected<ts::VerifiedData, std::string> ts::VerifiedData::initializeWithDefa
         throw std::exception("There must be at least one subject");
     }
 
-    std::map<Article::Id, Subject::Id> firstAppearance;
     std::map<Article::Id, std::set<Subject::Id>> appearance;
 
     if (auto error = checkDuplicates(subjects, articles); !error) {
@@ -26,14 +25,12 @@ tl::expected<ts::VerifiedData, std::string> ts::VerifiedData::initializeWithDefa
     }
 
     for (const auto& article : articles) {
-        firstAppearance.insert_or_assign(article.id, subjects.front().id);
         appearance.insert_or_assign(article.id, std::set<Subject::Id>{ subjects.front().id });
     }
 
     return ts::VerifiedData(ts::Data{
         .subjects = std::move(subjects),
         .articles = std::move(articles),
-        .firstAppearance = std::move(firstAppearance),
         .appearance = std::move(appearance)
     });
 }
@@ -47,15 +44,6 @@ tl::expected<ts::VerifiedData, std::string> ts::VerifiedData::verify(Data &&data
     }
 
     const auto [articleIds, subjectIds] = std::move(verifyRes).value();
-
-    for (const auto& [articleId, subjectId] : data.firstAppearance) {
-        if (!articleIds.count(articleId)) {
-            return tl::unexpected("article with id " + std::to_string(unsigned(articleId)) + " is not found");
-        }
-        if (!subjectIds.count(subjectId)) {
-            return tl::unexpected("subject with id " + std::to_string(unsigned(subjectId)) + " is not found");
-        }
-    }
 
     for (const auto& [articleId, linkedSubjectIds] : data.appearance) {
         if (!articleIds.count(articleId)) {
@@ -72,9 +60,6 @@ tl::expected<ts::VerifiedData, std::string> ts::VerifiedData::verify(Data &&data
     for (const auto& article : data.articles) {
         if (!data.appearance.count(article.id)) {
             return tl::unexpected("appearance is not found for article with id " + std::to_string(unsigned(article.id)));
-        }
-        if (!data.firstAppearance.count(article.id)) {
-            return tl::unexpected("first appearance is not found for article with id " + std::to_string(unsigned(article.id)));
         }
     }
 

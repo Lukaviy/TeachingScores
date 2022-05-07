@@ -151,43 +151,9 @@ tl::expected<ts::VerifiedData, std::string> ts::formats::JsonFormat::importData(
         }
     }
 
-    std::map<ts::Article::Id, ts::Subject::Id> firstAppearance;
-    {
-        auto firstAppearanceField = root["firstAppearance"];
-
-        if (!firstAppearanceField.isObject()) {
-            return tl::unexpected<std::string>("\'firstAppearance\' field must have object type");
-        }
-
-        const auto firstAppearanceObjet = firstAppearanceField.toObject();
-
-        for (auto iter = firstAppearanceObjet.begin(); iter != firstAppearanceObjet.end(); ++iter) {
-            bool ok = false;
-            auto articleIdInt = iter.key().toUInt(&ok);
-            if (!ok) {
-                return tl::unexpected<std::string>("\'articleId\' at 'appearance' field has bad format: " + iter.key().toStdString());
-            }
-
-            auto articleId = Article::Id(articleIdInt);
-
-            if (firstAppearance.count(articleId)) {
-                return tl::unexpected<std::string>("duplicate article ids at 'appearance' list " + std::to_string(unsigned(articleId)));
-            }
-
-            if (!iter.value().isDouble()) {
-                return tl::unexpected<std::string>("field values at 'appearance' object must have array type");
-            }
-
-            const auto subjectId = Subject::Id(iter.value().toInt());
-
-            firstAppearance.insert_or_assign(articleId, subjectId);
-        }
-    }
-
     return VerifiedData::verify(Data{
                                     .subjects = std::move(subjects),
                                     .articles = std::move(articles),
-                                    .firstAppearance = std::move(firstAppearance),
                                     .appearance = std::move(appearance)
                                 });
 }
@@ -213,11 +179,6 @@ QByteArray ts::formats::JsonFormat::exportData(const ts::ComputedDataModel &data
                             });
     }
 
-    QJsonObject firstAppearanceJson;
-    for (const auto& [articleId, subjectId] : data.data().firstAppearance) {
-        firstAppearanceJson[QString::number(unsigned(articleId))] = int(unsigned(subjectId));
-    }
-
     QJsonObject appearanceJson;
     for (const auto& [articleId, subjectIds] : data.data().appearance) {
         QJsonArray subjectIdsJson;
@@ -232,7 +193,6 @@ QByteArray ts::formats::JsonFormat::exportData(const ts::ComputedDataModel &data
     return QJsonDocument(QJsonObject{
                              {"subjects", std::move(subjectsListJson)},
                              {"articles", std::move(articlesListJson)},
-                             {"firstAppearance", std::move(firstAppearanceJson)},
                              {"appearance", std::move(appearanceJson)}
                          }).toJson();
 }

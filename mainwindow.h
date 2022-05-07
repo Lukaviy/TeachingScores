@@ -58,6 +58,6 @@ private:
 
     std::optional<QString> m_filePath;
 
-    QSettings m_settings{"Tsoi Productions", "Teaching Scores"};
+    QSettings m_settings{QSettings::Format::IniFormat, QSettings::Scope::UserScope, "Tsoi Productions", "Teaching Scores", };
 };
 #endif // MAINWINDOW_H

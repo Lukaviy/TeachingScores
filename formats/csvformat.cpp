@@ -33,10 +33,6 @@ QByteArray ts::formats::CsvFormat::exportData(const ts::ComputedDataModel &data)
                 cell += "🔴";
             }
 
-            if (data.isArticleFirstAppearedAt(article.id, subject.id)) {
-                cell += "✅";
-            }
-
             line << std::move(cell);
         }
 

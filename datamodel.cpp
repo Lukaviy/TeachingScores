@@ -12,7 +12,7 @@ ComputedDataModel ComputedDataModel::compute(VerifiedData &&verified_data)
     auto data = std::move(verified_data).data();
     std::map<Article::Id, algorithm::ComputedData> computedData;
     for (const auto& article : data.articles) {
-        auto computedDataForArticle = ts::algorithm::computeOuterLinks(data.subjects, data.firstAppearance, data.appearance, article.id);
+        auto computedDataForArticle = ts::algorithm::computeInnerLinks(data.subjects, data.appearance, article.id);
         computedData.insert_or_assign(article.id, std::move(computedDataForArticle));
     }
 
@@ -54,19 +54,6 @@ void ComputedDataModel::setAppearance(Subject::Id subjectId, Article::Id article
     m_C_nu = recomputeC_nu(m_C_nu.value(), oldC, newComputedData.c, int(m_computedData.size()));
 }
 
-void ComputedDataModel::setFirstAppearance(Subject::Id subjectId, Article::Id articleId)
-{
-    m_data.firstAppearance.insert_or_assign(articleId, subjectId);
-
-    const auto oldC = m_computedData.at(articleId).c;
-
-    const auto newComputedData = computeData(articleId);
-
-    m_computedData.insert_or_assign(articleId, newComputedData);
-
-    m_C_nu = recomputeC_nu(m_C_nu.value(), oldC, newComputedData.c, int(m_computedData.size()));
-}
-
 Subject::Id ComputedDataModel::addSubject(std::string&& name)
 {
     auto subjectId = Subject::Id(++m_lastSubjectId);
@@ -89,7 +76,6 @@ Article::Id ComputedDataModel::addArticle(std::string&& name)
     m_data.articles.emplace_back(Article { .id = articleId, .name = std::move(name) });
 
     m_data.appearance.insert_or_assign(articleId, std::set<Subject::Id> { m_data.subjects.front().id });
-    m_data.firstAppearance.insert_or_assign(articleId, m_data.subjects.front().id);
 
     m_computedData.insert_or_assign(articleId, computeData(articleId));
 
@@ -144,16 +130,9 @@ void ComputedDataModel::setSubjects(std::vector<Subject>&& subjects)
             }
         }
     }
-
-    for (auto iter = m_data.firstAppearance.begin(); iter != m_data.firstAppearance.end();) {
-        if (!subjectIds.contains(iter->second)) {
-            iter = m_data.firstAppearance.erase(iter);
-        } else {
-            ++iter;
-        }
-    }
-
+    
     m_C_nu = computeC_nu(m_computedData);
+
 }
 
 void ComputedDataModel::removeArticle(Article::Id articleId)
@@ -162,7 +141,6 @@ void ComputedDataModel::removeArticle(Article::Id articleId)
     m_data.articles.erase(iter.begin(), iter.end());
 
     m_data.appearance.erase(articleId);
-    m_data.firstAppearance.erase(articleId);
 
     m_computedData.erase(articleId);
 
@@ -178,17 +156,6 @@ bool ComputedDataModel::isArticleAppearedAt(Article::Id articleId, Subject::Id s
     }
 
     return articleColumn->second.contains(subjectId);
-}
-
-bool ComputedDataModel::isArticleFirstAppearedAt(Article::Id articleId, Subject::Id subjectId) const
-{
-    auto articleColumn = m_data.firstAppearance.find(articleId);
-
-    if (articleColumn == m_data.firstAppearance.end()) {
-        throw std::exception("There are no such article");
-    }
-
-    return articleColumn->second == subjectId;
 }
 
 const algorithm::ComputedData& ComputedDataModel::getComputedDataForArticle(Article::Id id) const
@@ -310,7 +277,7 @@ float ComputedDataModel::recomputeC_nu(float C_nu, float oldC, float newC, int s
 
 algorithm::ComputedData ComputedDataModel::computeData(Article::Id articleId) const
 {
-    return algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId);
+    return algorithm::computeInnerLinks(m_data.subjects, m_data.appearance, articleId);
 }
 
 DataModel::DataModel(ts::ComputedDataModel&& dataModel) : m_dataModel(std::move(dataModel))
@@ -375,9 +342,6 @@ QVariant DataModel::data(const QModelIndex &index, int role) const
 
         if (role == Qt::DisplayRole) {
             return m_dataModel.isArticleAppearedAt(article.id, subject.id) ? QString::fromWCharArray(L"🔴") : QVariant();
-        }
-        if (role == Qt::BackgroundRole) {
-            return m_dataModel.isArticleFirstAppearedAt(article.id, subject.id) ? QBrush(QColor(Qt::gray)) : QVariant();
         }
         if (role == Qt::TextAlignmentRole) {
             return Qt::AlignCenter;
@@ -460,8 +424,6 @@ bool DataModel::setData(const QModelIndex &index, const QVariant &value, int rol
         }
 
         if (role == Qt::EditRole && value.toBool()) {
-            m_dataModel.setFirstAppearance(subject.id, article.id);
-
             emit dataChanged(createIndex(index.row(), subjectsStart), createIndex(index.row(), columnCount(QModelIndex()) - 1));
 
             emit C_nu_changed(m_dataModel.getC_nu());

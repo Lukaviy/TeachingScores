@@ -94,3 +94,71 @@ ComputedData ts::algorithm::computeOuterLinks(const std::vector<Subject>& subjec
 
     return ComputedData { .l = l, .c = c, .h = h };
 }
+
+ComputedData ts::algorithm::computeInnerLinks(const std::vector<Subject> &subjects, const std::map<Article::Id, std::set<Subject::Id> > &appearance, Article::Id articleId)
+{
+    const auto& articleAppearance = appearance.at(articleId);
+
+    auto i_max = 0u;
+
+    for (auto i = 0u; i < subjects.size(); i++) {
+        if (articleAppearance.contains(subjects[i].id)) {
+            i_max = i + 1;
+        }
+    }
+
+    const auto t_p = std::distance(subjects.begin(), std::ranges::find_first_of(subjects, articleAppearance, {}, [](const auto& v) {return v.id;})) + 1;
+
+    std::vector<int> a_l(subjects.size());
+
+    {
+        for (auto i = 0u; i < subjects.size(); i++) {
+            if (articleAppearance.count(subjects[i].id) == 0) {
+                continue;
+            }
+
+            a_l[i] = i + 1 - t_p;
+        }
+    }
+
+    std::vector<int> a_l_t(subjects.size());
+
+    {
+        const auto r = [&](unsigned i, unsigned j) {
+            auto res = 0u;
+
+            for (auto k = i; k < j; k++) {
+                if (!articleAppearance.contains(subjects[k].id)) {
+                    res += 1;
+                }
+            }
+
+            return res;
+        };
+
+        for (auto i = 0u; i < subjects.size(); i++) {
+            if (articleAppearance.count(subjects[i].id) == 0) {
+                continue;
+            }
+
+            a_l_t[i] = a_l[i] - r(t_p, i);
+        }
+    }
+
+    const auto l = float(i_max - t_p) / (subjects.size() - 1);
+
+    auto c = 0.f;
+    {
+        for (auto i = 0u; i < subjects.size(); i++) {
+            if (a_l_t[i] != 0 && a_l[i] != 0) {
+                c += float(a_l_t[i]) / float(a_l[i]);
+            }
+        }
+
+        c /= (subjects.size() - 1);
+    }
+
+    const auto h = l * c;
+
+    return ComputedData { .l = l, .c = c, .h = h };
+}

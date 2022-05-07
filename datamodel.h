@@ -13,7 +13,6 @@ namespace ts {
         static ComputedDataModel compute(VerifiedData&& data);
 
         void setAppearance(Subject::Id, Article::Id, bool appearance);
-        void setFirstAppearance(Subject::Id, Article::Id);
 
         Subject::Id addSubject(std::string&& name);
         Article::Id addArticle(std::string&& article);
@@ -28,7 +27,6 @@ namespace ts {
         void removeArticle(Article::Id articleId);
 
         bool isArticleAppearedAt(Article::Id, Subject::Id) const;
-        bool isArticleFirstAppearedAt(Article::Id, Subject::Id) const;
 
         const algorithm::ComputedData& getComputedDataForArticle(Article::Id id) const;
 
