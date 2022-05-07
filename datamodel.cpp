@@ -225,10 +225,10 @@ void ComputedDataModel::sort()
     articlesWithC.reserve(m_data.articles.size());
 
     for (const auto& articleId : m_data.articles) {
-        articlesWithC.push_back({articleId, m_computedData.at(articleId.id).c});
+        articlesWithC.push_back({articleId, m_computedData.at(articleId.id).h});
     }
 
-    std::ranges::sort(articlesWithC, {}, [](const auto& t) { return t.second; });
+    std::ranges::sort(articlesWithC, std::greater{}, [](const auto& t) { return t.second; });
 
     for (auto i = 0u; i < articlesWithC.size(); i++) {
         m_data.articles[i] = std::move(articlesWithC[i].first);
