@@ -1,11 +1,13 @@
 #include "addnewsubjectdialog.h"
 #include "ui_addnewsubjectdialog.h"
 
-AddNewSubjectDialog::AddNewSubjectDialog(QWidget *parent) :
+AddNewSubjectDialog::AddNewSubjectDialog(std::string&& entityName, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::AddNewSubjectDialog)
 {
     ui->setupUi(this);
+
+    setWindowTitle("Add " + QString::fromStdString(std::move(entityName)));
 }
 
 AddNewSubjectDialog::~AddNewSubjectDialog()

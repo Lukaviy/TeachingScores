@@ -106,7 +106,7 @@ void MainWindow::openFile()
 
 void MainWindow::addNewSubject()
 {
-    AddNewSubjectDialog dialog;
+    AddNewSubjectDialog dialog("Subjects");
 
     if (dialog.exec() == QDialog::Rejected) {
         return;
@@ -144,7 +144,7 @@ void MainWindow::addNewArticle()
         throw std::exception("Model is not ready");
     }
 
-    AddNewSubjectDialog dialog;
+    AddNewSubjectDialog dialog("Articles");
 
     if (dialog.exec() == QDialog::Rejected) {
         return;

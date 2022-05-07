@@ -12,7 +12,7 @@ class AddNewSubjectDialog : public QDialog
     Q_OBJECT
 
 public:
-    explicit AddNewSubjectDialog(QWidget *parent = nullptr);
+    explicit AddNewSubjectDialog(std::string&& entityName, QWidget *parent = nullptr);
     ~AddNewSubjectDialog();
 
     QStringList getSubjectNames();

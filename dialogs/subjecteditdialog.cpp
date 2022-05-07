@@ -60,7 +60,7 @@ void SubjectEditDialog::addSubject()
 {
     const auto currentIndex = ui->tableView->currentIndex();
 
-    AddNewSubjectDialog dialog;
+    AddNewSubjectDialog dialog("Subjects");
 
     if (dialog.exec() == QDialog::Rejected) {
         return;
