@@ -155,7 +155,7 @@ ComputedData ts::algorithm::computeInnerLinks(const std::vector<Subject> &subjec
             }
         }
 
-        c /= (subjects.size() - 1);
+        c /= (subjects.size());
     }
 
     const auto h = l * c;
