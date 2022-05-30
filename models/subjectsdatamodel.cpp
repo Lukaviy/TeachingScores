@@ -123,7 +123,7 @@ void SubjectsDataModel::add(int index, std::vector<std::string>&& names)
     beginInsertRows(QModelIndex(), index + 1, index + int(names.size()));
 
     for (auto&& name : names) {
-        m_subjects.insert(m_subjects.begin() + (index + 1), ts::Subject{ .id = m_idGenerator.newId(), .name = std::move(name) });
+        m_subjects.insert(m_subjects.begin() + (++index), ts::Subject{ .id = m_idGenerator.newId(), .name = std::move(name) });
     }
 
     endInsertRows();
