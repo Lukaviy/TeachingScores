@@ -188,7 +188,12 @@ void MainWindow::editSubjects()
         return;
     }
 
-    m_dataModel->setSubjects(std::move(subjects));
+    if (!m_dataModel) {
+        auto data = ts::VerifiedData::initializeWithDefaults(std::move(subjects), {}).value();
+        setNewModel(std::make_unique<DataModel>(ts::ComputedDataModel::compute(std::move(data))));
+    } else {
+        m_dataModel->setSubjects(std::move(subjects));
+    }
 }
 
 void MainWindow::removeArticle()
