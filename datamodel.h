@@ -45,6 +45,8 @@ namespace ts {
         static std::optional<float> computeC_nu(const std::map<Article::Id, algorithm::ComputedData>& computedData);
         static float recomputeC_nu(float C_nu, float oldC, float newC, int size);
 
+        algorithm::ComputedData computeData(Article::Id articleId) const;
+
         Data m_data;
 
         std::map<Article::Id, algorithm::ComputedData> m_computedData;

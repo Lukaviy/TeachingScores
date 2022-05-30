@@ -47,7 +47,7 @@ void ComputedDataModel::setAppearance(Subject::Id subjectId, Article::Id article
     }
 
     const auto oldC = m_computedData.at(articleId).c;
-    const auto newComputedData = algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId);
+    const auto newComputedData = computeData(articleId);
 
     m_computedData.insert_or_assign(articleId, newComputedData);
 
@@ -60,7 +60,7 @@ void ComputedDataModel::setFirstAppearance(Subject::Id subjectId, Article::Id ar
 
     const auto oldC = m_computedData.at(articleId).c;
 
-    const auto newComputedData = algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId);
+    const auto newComputedData = computeData(articleId);
 
     m_computedData.insert_or_assign(articleId, newComputedData);
 
@@ -74,7 +74,7 @@ Subject::Id ComputedDataModel::addSubject(std::string&& name)
     m_data.subjects.emplace_back(Subject { .id = subjectId, .name = std::move(name) });
 
     for (auto& [articleId, data] : m_computedData) {
-        data = ts::algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId);
+        data = computeData(articleId);
     }
 
     m_C_nu = computeC_nu(m_computedData);
@@ -91,7 +91,7 @@ Article::Id ComputedDataModel::addArticle(std::string&& name)
     m_data.appearance.insert_or_assign(articleId, std::set<Subject::Id> { m_data.subjects.front().id });
     m_data.firstAppearance.insert_or_assign(articleId, m_data.subjects.front().id);
 
-    m_computedData.insert_or_assign(articleId, algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId));
+    m_computedData.insert_or_assign(articleId, computeData(articleId));
 
     m_C_nu = computeC_nu(m_computedData);
 
@@ -205,13 +205,13 @@ void ComputedDataModel::toggleSubjectAppearance(Article::Id id)
         for (const auto& subject : m_data.subjects) {
             subjectsSet.insert(subject.id);
         }
-        m_data.appearance[id] = subjectsSet;
+        m_data.appearance[id] = std::move(subjectsSet);
     } else {
         m_data.appearance[id].clear();
         m_data.appearance[id].insert(m_data.subjects.front().id);
     }
 
-    m_computedData[id] = getComputedDataForArticle(id);
+    m_computedData[id] = computeData(id);
 }
 
 std::optional<float> ComputedDataModel::getC_nu() const noexcept
@@ -298,6 +298,11 @@ std::optional<float> ComputedDataModel::computeC_nu(const std::map<Article::Id, 
 float ComputedDataModel::recomputeC_nu(float C_nu, float oldC, float newC, int size)
 {
     return C_nu - (oldC - newC) / size;
+}
+
+algorithm::ComputedData ComputedDataModel::computeData(Article::Id articleId) const
+{
+    return algorithm::computeOuterLinks(m_data.subjects, m_data.firstAppearance, m_data.appearance, articleId);
 }
 
 DataModel::DataModel(ts::ComputedDataModel&& dataModel) : m_dataModel(std::move(dataModel))
