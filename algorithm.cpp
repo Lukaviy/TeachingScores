@@ -22,12 +22,6 @@ ComputedData ts::algorithm::computeOuterLinks(const std::vector<Subject>& subjec
 
     const auto t_p = std::min(std::distance(subjects.begin(), std::ranges::find_first_of(subjects, articleAppearance, {}, [](const auto& v) {return v.id;})) + 1, t_m);
 
-    std::vector<int> p_k_mu(subjects.size());
-
-    for (auto i = 0u; i < subjects.size(); i++) {
-        p_k_mu[i] = i < t_m - 1 ? 1 : 2;
-    }
-
     std::vector<int> a_l(subjects.size());
 
     {
@@ -59,7 +53,7 @@ ComputedData ts::algorithm::computeOuterLinks(const std::vector<Subject>& subjec
 
             for (auto k = i; k < j; k++) {
                 if (articleAppearance.count(subjects[k].id) == 0) {
-                    res += p_k_mu[k];
+                    res++;
                 }
             }
 
