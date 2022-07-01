@@ -152,6 +152,8 @@ void ComputedDataModel::setSubjects(std::vector<Subject>&& subjects)
             ++iter;
         }
     }
+
+    m_C_nu = computeC_nu(m_computedData);
 }
 
 void ComputedDataModel::removeArticle(Article::Id articleId)
@@ -163,6 +165,8 @@ void ComputedDataModel::removeArticle(Article::Id articleId)
     m_data.firstAppearance.erase(articleId);
 
     m_computedData.erase(articleId);
+
+    m_C_nu = computeC_nu(m_computedData);
 }
 
 bool ComputedDataModel::isArticleAppearedAt(Article::Id articleId, Subject::Id subjectId) const
@@ -211,7 +215,11 @@ void ComputedDataModel::toggleSubjectAppearance(Article::Id id)
         m_data.appearance[id].insert(m_data.subjects.front().id);
     }
 
-    m_computedData[id] = computeData(id);
+    auto data = computeData(id);
+
+    m_C_nu = recomputeC_nu(m_C_nu.value(), m_computedData[id].c, data.c, m_computedData.size());
+
+    m_computedData[id] = std::move(data);
 }
 
 std::optional<float> ComputedDataModel::getC_nu() const noexcept
@@ -486,6 +494,8 @@ void DataModel::addSubject(std::string&& name)
     beginInsertColumns(QModelIndex(), subjectsEndColumnIndex, subjectsEndColumnIndex);
     m_dataModel.addSubject(std::move(name));
     endInsertColumns();
+
+    emit C_nu_changed(m_dataModel.getC_nu());
 }
 
 void DataModel::addArticle(std::string&& name)
@@ -493,6 +503,8 @@ void DataModel::addArticle(std::string&& name)
     beginInsertRows(QModelIndex(), rowCount(QModelIndex()), rowCount(QModelIndex()));
     m_dataModel.addArticle(std::move(name));
     endInsertRows();
+
+    emit C_nu_changed(m_dataModel.getC_nu());
 }
 
 void DataModel::sort()
@@ -511,6 +523,7 @@ void DataModel::toggleWholeRow(const QModelIndex &index)
     m_dataModel.toggleSubjectAppearance(m_dataModel.getArticles()[index.row()].id);
 
     emit dataChanged(createIndex(index.row(), 0), createIndex(index.row(), columnCount(QModelIndex()) - 1));
+    emit C_nu_changed(m_dataModel.getC_nu());
 }
 
 std::optional<int> DataModel::getSubjectIndex(int column) const
@@ -538,6 +551,7 @@ void DataModel::setSubjects(std::vector<ts::Subject> &&subjects)
 
     emit dataChanged(createIndex(0, 0), createIndex(rowCount(QModelIndex()) - 1, columnCount(QModelIndex()) - 1));
     emit headerDataChanged(Qt::Horizontal, 0, columnCount(QModelIndex()) - 1);
+    emit C_nu_changed(m_dataModel.getC_nu());
 }
 
 void DataModel::toggleAppearance(const QModelIndex &index)
@@ -549,6 +563,8 @@ void DataModel::toggleAppearance(const QModelIndex &index)
 
         setData(index, m_dataModel.isArticleAppearedAt(article.id, subject.id) ? Qt::Unchecked : Qt::Checked, Qt::CheckStateRole);
     }
+
+    emit C_nu_changed(m_dataModel.getC_nu());
 }
 
 void DataModel::removeArticle(int row)
@@ -556,6 +572,8 @@ void DataModel::removeArticle(int row)
     beginRemoveRows(QModelIndex(), row, row);
     m_dataModel.removeArticle(m_dataModel.getArticles().at(row).id);
     endRemoveRows();
+
+    emit C_nu_changed(m_dataModel.getC_nu());
 }
 
 int DataModel::getSubjectsColumnIndexEnd() const
