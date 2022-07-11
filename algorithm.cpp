@@ -8,15 +8,19 @@ ComputedData ts::algorithm::computeOuterLinks(const std::vector<Subject>& subjec
 {
     const auto& articleAppearance = appearance.at(articleId);
 
+    const auto firstAppearanceSubjectId = firstAppearance.at(articleId);
+
+    auto isDotSetted = [&](Subject::Id id) -> bool {
+        return articleAppearance.contains(id) || id == firstAppearanceSubjectId;
+    };
+
     auto i_max = 0u;
 
     for (auto i = 0u; i < subjects.size(); i++) {
-        if (articleAppearance.contains(subjects[i].id)) {
+        if (isDotSetted(subjects[i].id)) {
             i_max = i + 1;
         }
     }
-
-    const auto firstAppearanceSubjectId = firstAppearance.at(articleId);
 
     const auto t_m = std::distance(subjects.begin(), std::ranges::find(subjects, firstAppearanceSubjectId, [](const auto& v) {return v.id;})) + 1;
 
@@ -29,7 +33,7 @@ ComputedData ts::algorithm::computeOuterLinks(const std::vector<Subject>& subjec
         const auto p_1 = 1;
 
         for (auto i = 0u; i < subjects.size(); i++) {
-            if (articleAppearance.count(subjects[i].id) == 0) {
+            if (isDotSetted(subjects[i].id) == 0) {
                 continue;
             }
 
@@ -52,7 +56,7 @@ ComputedData ts::algorithm::computeOuterLinks(const std::vector<Subject>& subjec
             auto res = 0u;
 
             for (auto k = i; k < j; k++) {
-                if (articleAppearance.count(subjects[k].id) == 0) {
+                if (isDotSetted(subjects[k].id) == 0) {
                     res++;
                 }
             }
@@ -61,7 +65,7 @@ ComputedData ts::algorithm::computeOuterLinks(const std::vector<Subject>& subjec
         };
 
         for (auto i = 0u; i < subjects.size(); i++) {
-            if (articleAppearance.count(subjects[i].id) == 0) {
+            if (isDotSetted(subjects[i].id) == 0) {
                 continue;
             }
 
